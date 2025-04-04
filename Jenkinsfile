@@ -61,8 +61,12 @@ pipeline {
             steps {
                 script {
                     echo "Fixing Minikube permissions..."
-                    sh "bash /home/jenkins/fix_minikube_permissions.sh"
-
+                    sh '''
+                        sudo chown -R jenkins:jenkins /home/master/.minikube /var/lib/jenkins/.kube
+                        sudo chmod -R 755 /home/master/.minikube
+                        sudo chmod 600 /var/lib/jenkins/.kube/config
+                        export KUBECONFIG=/var/lib/jenkins/.kube/config
+                    '''
                 }
             }
         }
