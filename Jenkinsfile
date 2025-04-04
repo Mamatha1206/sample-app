@@ -61,7 +61,8 @@ pipeline {
             steps {
                 script {
                     echo "Fixing Minikube permissions..."
-                    sh "bash ~/fix_minikube_permissions.sh"
+                    sh "bash /home/jenkins/fix_minikube_permissions.sh"
+
                 }
             }
         }
