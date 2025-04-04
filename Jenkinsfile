@@ -26,7 +26,7 @@ pipeline {
                     echo "Setting up a Python virtual environment..."
                     sh '''
                         python3 -m venv ${VENV_DIR}
-                        . ${VENV_DIR}/bin/activate  # Use '.' instead of 'source'
+                        . ${VENV_DIR}/bin/activate
                         pip install --upgrade pip
                         pip install -r requirements.txt
                     '''
@@ -53,6 +53,26 @@ pipeline {
                             docker push ${DOCKER_IMAGE}
                         '''
                     }
+                }
+            }
+        }
+
+        stage('Fix Minikube Permissions') {
+            steps {
+                script {
+                    echo "Fixing Minikube permissions..."
+                    sh '''
+                        sudo cp -r /home/master/.minikube /var/lib/jenkins/
+                        sudo chown -R jenkins:jenkins /var/lib/jenkins/.minikube
+                        sudo chmod 644 /var/lib/jenkins/.minikube/ca.crt
+                        sudo chmod 600 /var/lib/jenkins/.minikube/profiles/minikube/client.crt
+                        sudo chmod 600 /var/lib/jenkins/.minikube/profiles/minikube/client.key
+                        sudo mkdir -p /var/lib/jenkins/.kube
+                        sudo cp /home/master/.kube/config /var/lib/jenkins/.kube/
+                        sudo chown -R jenkins:jenkins /var/lib/jenkins/.kube
+                        sudo chmod 600 /var/lib/jenkins/.kube/config
+                        sudo systemctl restart jenkins
+                    '''
                 }
             }
         }
