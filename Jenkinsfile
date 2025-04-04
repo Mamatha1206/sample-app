@@ -2,9 +2,12 @@ pipeline {
     agent any
 
     environment {
+        GITHUB_REPO_URL = "https://github.com/Mamatha1206/sample-app.git"
+        BRANCH_NAME = "main"
         DOCKER_IMAGE = "mamatha0124/sample-app:latest"
-        DOCKER_CREDENTIALS_ID = "DOCKER_CREDENTIALS_ID"
+        DOCKER_CREDENTIALS_ID = "docker-hub-credentials"
         KUBECONFIG = "/root/.kube/config"  // Update if needed
+        VENV_DIR = "venv"  // Virtual environment directory
     }
 
     stages {
@@ -12,16 +15,21 @@ pipeline {
             steps {
                 script {
                     echo "Cloning the repository..."
-                    checkout scm
+                    git branch: "${BRANCH_NAME}", url: "${GITHUB_REPO_URL}"
                 }
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Setup Virtual Environment & Install Dependencies') {
             steps {
                 script {
-                    echo "Installing Python dependencies..."
-                    sh 'pip install -r requirements.txt'
+                    echo "Setting up a Python virtual environment..."
+                    sh '''
+                        python3 -m venv ${VENV_DIR}
+                        source ${VENV_DIR}/bin/activate
+                        pip install --upgrade pip
+                        pip install -r requirements.txt
+                    '''
                 }
             }
         }
