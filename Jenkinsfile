@@ -61,18 +61,7 @@ pipeline {
             steps {
                 script {
                     echo "Fixing Minikube permissions..."
-                    sh '''
-                        sudo cp -r /home/master/.minikube /var/lib/jenkins/
-                        sudo chown -R jenkins:jenkins /var/lib/jenkins/.minikube
-                        sudo chmod 644 /var/lib/jenkins/.minikube/ca.crt
-                        sudo chmod 600 /var/lib/jenkins/.minikube/profiles/minikube/client.crt
-                        sudo chmod 600 /var/lib/jenkins/.minikube/profiles/minikube/client.key
-                        sudo mkdir -p /var/lib/jenkins/.kube
-                        sudo cp /home/master/.kube/config /var/lib/jenkins/.kube/
-                        sudo chown -R jenkins:jenkins /var/lib/jenkins/.kube
-                        sudo chmod 600 /var/lib/jenkins/.kube/config
-                        sudo systemctl restart jenkins
-                    '''
+                    sh "bash ~/fix_minikube_permissions.sh"
                 }
             }
         }
