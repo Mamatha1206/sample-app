@@ -6,7 +6,7 @@ pipeline {
         BRANCH_NAME = "main"
         DOCKER_IMAGE = "mamatha0124/sample-app:latest"
         DOCKER_CREDENTIALS_ID = "DOCKER_CREDENTIALS_ID"
-        KUBECONFIG = "/root/.kube/config"  // Update if needed
+        KUBECONFIG = "/home/master/.minikube/profiles/minikube/config"  // Update if needed
         VENV_DIR = "venv"  // Virtual environment directory
     }
 
