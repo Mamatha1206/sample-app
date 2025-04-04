@@ -5,7 +5,7 @@ pipeline {
         GITHUB_REPO_URL = "https://github.com/Mamatha1206/sample-app.git"
         BRANCH_NAME = "main"
         DOCKER_IMAGE = "mamatha0124/sample-app:latest"
-        DOCKER_CREDENTIALS_ID = "docker-hub-credentials"
+        DOCKER_CREDENTIALS_ID = "DOCKER_CREDENTIALS_ID"
         KUBECONFIG = "/root/.kube/config"  // Update if needed
         VENV_DIR = "venv"  // Virtual environment directory
     }
