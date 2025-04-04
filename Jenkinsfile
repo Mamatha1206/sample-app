@@ -6,7 +6,7 @@ pipeline {
         BRANCH_NAME = "main"
         DOCKER_IMAGE = "mamatha0124/sample-app:latest"
         DOCKER_CREDENTIALS_ID = "DOCKER_CREDENTIALS_ID"
-        KUBECONFIG = "/home/master/.minikube/profiles/minikube/config"  // Update if needed
+        KUBECONFIG = "/var/lib/jenkins/.kube/config"  // Fixed KUBECONFIG path for Jenkins
         VENV_DIR = "venv"  // Virtual environment directory
     }
 
@@ -25,9 +25,8 @@ pipeline {
                 script {
                     echo "Setting up a Python virtual environment..."
                     sh '''
-                        #!/bin/bash
                         python3 -m venv ${VENV_DIR}
-                        . ${VENV_DIR}/bin/activate
+                        source ${VENV_DIR}/bin/activate
                         pip install --upgrade pip
                         pip install -r requirements.txt
                     '''
@@ -49,8 +48,10 @@ pipeline {
                 script {
                     echo "Pushing Docker image to DockerHub..."
                     withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS_ID, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                        sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
-                        sh "docker push ${DOCKER_IMAGE}"
+                        sh '''
+                            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                            docker push ${DOCKER_IMAGE}
+                        '''
                     }
                 }
             }
@@ -59,9 +60,12 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    echo "Applying Kubernetes deployment and service..."
-                    sh "kubectl apply -f deployment.yaml"
-                    sh "kubectl apply -f service.yaml"
+                    echo "Deploying to Kubernetes..."
+                    sh '''
+                        export KUBECONFIG=${KUBECONFIG}
+                        kubectl apply -f deployment.yaml || { echo "Failed to apply deployment"; exit 1; }
+                        kubectl apply -f service.yaml || { echo "Failed to apply service"; exit 1; }
+                    '''
                 }
             }
         }
@@ -69,10 +73,10 @@ pipeline {
 
     post {
         success {
-            echo "Deployment successful! Application is live."
+            echo "✅ Deployment successful! Application is live."
         }
         failure {
-            echo "Deployment failed! Check logs for issues."
+            echo "❌ Deployment failed! Check logs for issues."
         }
     }
 }
