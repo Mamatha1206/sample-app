@@ -2,8 +2,6 @@ pipeline {
     agent any
 
     environment {
-        GITHUB_REPO_URL = "https://github.com/Mamatha1206/sample-app.git" // 🔹 Replace with your repo URL
-        BRANCH_NAME = "main"  // 🔹 Replace with the branch you want to use
         DOCKER_IMAGE = "mamatha0124/sample-app:latest"
         DOCKER_CREDENTIALS_ID = "DOCKER_CREDENTIALS_ID"
         KUBECONFIG = "/root/.kube/config"  // Update if needed
@@ -13,8 +11,8 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 script {
-                    echo "Cloning the repository from ${GITHUB_REPO_URL} (Branch: ${BRANCH_NAME})..."
-                    git branch: "${main}", url: "${https://github.com/Mamatha1206/sample-app.git}"
+                    echo "Cloning the repository..."
+                    checkout scm
                 }
             }
         }
