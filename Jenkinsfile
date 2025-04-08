@@ -57,20 +57,6 @@ pipeline {
             }
         }
 
-        stage('Fix Minikube Permissions') {
-            steps {
-                script {
-                    echo "Fixing Minikube permissions..."
-                    sh '''
-                        sudo chown -R jenkins:jenkins /home/master/.minikube /var/lib/jenkins/.kube
-                        sudo chmod -R 755 /home/master/.minikube
-                        sudo chmod 600 /var/lib/jenkins/.kube/config
-                        export KUBECONFIG=/var/lib/jenkins/.kube/config
-                    '''
-                }
-            }
-        }
-
         stage('Deploy to Kubernetes') {
             steps {
                 script {
